@@ -1,0 +1,69 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="ProjectDBModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+  <EntityType Name="Service">
+    <Key>
+      <PropertyRef Name="ServiceID" />
+    </Key>
+    <Property Name="ServiceID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="ServiceName" Type="String" MaxLength="150" FixedLength="true" Unicode="true" Nullable="false" />
+    <NavigationProperty Name="UsersServices" Relationship="Self.FK_UsersServices_Services" FromRole="Services" ToRole="UsersServices" />
+  </EntityType>
+  <EntityType Name="User">
+    <Key>
+      <PropertyRef Name="UserID" />
+    </Key>
+    <Property Name="UserID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Name" Type="String" MaxLength="150" FixedLength="true" Unicode="true" Nullable="false" />
+    <Property Name="Mobile" Type="String" MaxLength="150" FixedLength="true" Unicode="true" Nullable="false" />
+    <Property Name="Email" Type="String" MaxLength="150" FixedLength="true" Unicode="true" Nullable="false" />
+    <NavigationProperty Name="UsersServices" Relationship="Self.FK_UsersServices_Users" FromRole="Users" ToRole="UsersServices" />
+  </EntityType>
+  <EntityType Name="UsersService">
+    <Key>
+      <PropertyRef Name="UsersServicesID" />
+    </Key>
+    <Property Name="UsersServicesID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="UserID" Type="Int32" Nullable="false" />
+    <Property Name="ServiceID" Type="Int32" Nullable="false" />
+    <Property Name="InterestedValue" Type="Decimal" Precision="18" Scale="0" Nullable="false" />
+    <NavigationProperty Name="Service" Relationship="Self.FK_UsersServices_Services" FromRole="UsersServices" ToRole="Services" />
+    <NavigationProperty Name="User" Relationship="Self.FK_UsersServices_Users" FromRole="UsersServices" ToRole="Users" />
+  </EntityType>
+  <Association Name="FK_UsersServices_Services">
+    <End Role="Services" Type="Self.Service" Multiplicity="1" />
+    <End Role="UsersServices" Type="Self.UsersService" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Services">
+        <PropertyRef Name="ServiceID" />
+      </Principal>
+      <Dependent Role="UsersServices">
+        <PropertyRef Name="ServiceID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_UsersServices_Users">
+    <End Role="Users" Type="Self.User" Multiplicity="1" />
+    <End Role="UsersServices" Type="Self.UsersService" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Users">
+        <PropertyRef Name="UserID" />
+      </Principal>
+      <Dependent Role="UsersServices">
+        <PropertyRef Name="UserID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <EntityContainer Name="ProjectDBEntities" annotation:LazyLoadingEnabled="true">
+    <EntitySet Name="Services" EntityType="Self.Service" />
+    <EntitySet Name="Users" EntityType="Self.User" />
+    <EntitySet Name="UsersServices" EntityType="Self.UsersService" />
+    <AssociationSet Name="FK_UsersServices_Services" Association="Self.FK_UsersServices_Services">
+      <End Role="Services" EntitySet="Services" />
+      <End Role="UsersServices" EntitySet="UsersServices" />
+    </AssociationSet>
+    <AssociationSet Name="FK_UsersServices_Users" Association="Self.FK_UsersServices_Users">
+      <End Role="Users" EntitySet="Users" />
+      <End Role="UsersServices" EntitySet="UsersServices" />
+    </AssociationSet>
+  </EntityContainer>
+</Schema>

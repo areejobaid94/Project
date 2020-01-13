@@ -1,0 +1,236 @@
+﻿@model MyProject.Models.UserModel
+
+@{
+    ViewBag.Title = "Add User";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - My Project</title>
+    @Scripts.Render("~/bundles/modernizr")
+    <link rel="stylesheet" href='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.0.3/css/bootstrap.min.css' />
+    <script type="text/javascript" src='https://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.8.3.min.js'></script>
+    <script type="text/javascript" src='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.0.3/js/bootstrap.min.js'></script>
+</head>
+<body>
+
+    <!--Create User form-->
+    <form method="post" action="Default.aspx" id="form1" style="position:fixed;
+   left:40%;">
+        <fieldset id="SubmitForm">
+            <div style="width: 400px;">
+                <br>
+                <h2 style="color:lightskyblue ;margin-left:20%">
+                    Get Start
+                </h2>
+                <label for="UserID" hidden>
+                    UserID
+                </label>
+                <input name="UserId" type="text" id="UserId" hidden />
+                <br />
+                <label for="Username">
+                    Name
+                </label>
+                <input name="txtName" type="text" id="txtName" class="form-control" placeholder="Enter your name"
+                       required />
+                <br />
+                <label for="MobileNumber">
+                    Mobile Number
+                </label>
+                <input name="txtMobileNumber" type="text" id="txtMobileNumber" class="form-control"
+                       placeholder="Enter your mobile number" required />
+                <br />
+                <label for="Email">
+                    Email
+                </label>
+                <input name="txtEmail" id="txtEmail" class="form-control" placeholder="Enter your E-mail"
+                       required type="email" />
+                <div>
+                    <a href="#" class="btn btn-info" id="SaveUser" style="margin-left:25% ; margin-top :15%">Save</a> <br /><br />
+                </div>
+
+            </div>
+        </fieldset>
+    </form>
+
+    <!--Service form-->
+    <div class="modal fade" id="ServiceModel">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <a href="#" class="close" data-dismiss="modal">&times;</a>
+                    <h4 id="ServiceModalTitle"></h4>
+                </div>
+                <div class="modal-body">
+                    <form id="form">
+                        <fieldset id="SubmitForm1">
+                            <div class="form-group">
+                                <div>
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th id="UseId" hidden></th>
+                                                <th>Service ID</th>
+                                                <th>Service Name</th>
+                                                <th>Select</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="SetAllService" style="color : lightseagreen">
+                                            <tr id="#LoadingStatus"></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <button  onclick="prepareEmale()">Submite</button>
+                        </fieldset>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!--After Selecting Service form-->
+    <div class="modal fade" id="AfterSelectingServiceModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <a href="#" class="close" data-dismiss="modal">&times;</a>
+                    <h4 id="AfterSelectingServiceModalTitle"></h4>
+                </div>
+                <div class="modal-body">
+                    <form id="SelectedServiceform">
+                        <fieldset id="SubmitForm2">
+                            <div class="form-group">
+                                <div style="margin-left : 20%">
+                                    <input type="number" id="ServiceId" hidden />
+                                    <a href="#" class="btn btn-info" onclick="SetSelectedInterestedValue(1)" >Very Intersted</a>
+                                    <a href="#" class="btn btn-info" onclick="SetSelectedInterestedValue(2)" >Intersted</a>
+                                    <a href="#" class="btn btn-info" onclick="SetSelectedInterestedValue(3)" >Not Intersted</a>
+                                    <br/>
+                                </div>
+                                <input type="button" value="Ok" id="SaveUserService" />
+                            </div>
+                        </fieldset>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--Javascript Section-->
+    <script>
+        var SelectedInterctedValue = 0;
+
+        //Get all the services from the DataBase and fill the services table
+        $("#LoadingStatus").html("Loading....");
+        $.get("/UserService/GetAllService", null, DataBind);
+        function DataBind(ServiceModelList) {
+            var SetData = $("#SetAllService");
+            console.log(ServiceModelList)
+            for (var i = 0; i < ServiceModelList.length; i++) {
+                var Data = "<tr class = 'row_" + ServiceModelList[i].ServiceID + "'>" +
+                    "<td>" + ServiceModelList[i].ServiceID + "</td>" +
+                    "<td>" + ServiceModelList[i].ServiceName + "</td>" +
+                    "<td>" + '<a href="#" class="btn btn-info" onclick="AfterSelectingService(' + ServiceModelList[i].ServiceID + ')" >Select</a> <br /><br />' + "</td>"
+                "</tr>";
+                SetData.append(Data)
+            }
+        }
+
+        //Show The Popup Modal For Select one or more Service
+        function SelectService(UserName) {
+            $("#ServiceModalTitle").html(UserName + " Select One Or More Service");
+            $("#ServiceModel").modal();
+        }
+
+        //Save UserService Data     
+        $("#SaveUserService").click(function () {
+            var UserServiceData = new Object();
+            UserServiceData.UserID = $('#UserId').val(),
+            UserServiceData.ServiceID = $('#ServiceId').val(),
+            UserServiceData.InterestedValue = SelectedInterctedValue;
+            console.log(UserServiceData)
+            $.ajax({
+                url: "/UserService/SaveUserService",
+                type: "POST",
+                data:  JSON.stringify(UserServiceData),
+                contentType: "application/json; charset=utf-8",  
+                success: function (result) {
+                   alert("The Service have Saved"); 
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                alert(xhr.status);
+                alert(thrownError);
+                }
+            });
+        })
+
+        //Save User Data     
+        $("#SaveUser").click(function () {
+                var UserData = new Object();
+                UserData.Name = $('#txtName').val(),
+                UserData.Mobile = $('#txtMobileNumber').val(),
+                UserData.Email = $('#txtEmail').val();
+                console.log(UserData)
+            $.ajax({
+                    url: "/UserService/SaveUser",
+                    type: "POST",
+                    data:  JSON.stringify(UserData),
+                    contentType: "application/json; charset=utf-8",  
+                success: function (result) {
+                        alert("You have saved successfully"); 
+                        console.log(result)
+                        SelectService(result.Name)
+                        $("#UserId").val(result.UserID); 
+                    },
+                        error: function (xhr, ajaxOptions, thrownError) {
+                        alert(xhr.status);
+                        alert(thrownError);
+                    }
+            });
+        })
+
+        //Show The Popup Modal After Selecting Service
+        function AfterSelectingService(ServiceId)
+        {
+            $("#ServiceId").val(ServiceId);
+            $("#AfterSelectingServiceModalTitle").html("How much are you Interested In this Service");
+            $("#AfterSelectingServiceModal").modal();
+        }
+
+        function SetSelectedInterestedValue(SelectedValue) {
+            SelectedInterctedValue = SelectedValue;
+        };
+
+        // prepare Emale before sending
+        function prepareEmale() {
+            var UserID = parseInt( $('#UserId').val());
+             console.log(UserID);
+              $.ajax({
+                url: "/UserService/GetUserData?UserId=" + UserID,
+                type: "POST",
+                data: JSON.stringify(UserID),
+                contentType: "application/json; charset=utf-8",
+                success: function (result) {
+                    alert("You have Submitted successfully"); 
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    alert(xhr.status);
+                    alert(thrownError);
+                }
+            });
+            
+        }
+    </script>
+
+    @section Scripts {
+        @Scripts.Render("~/bundles/jquery")
+        @Scripts.Render("~/bundles/bootstrap")
+    }
+</body>
+</html>
+

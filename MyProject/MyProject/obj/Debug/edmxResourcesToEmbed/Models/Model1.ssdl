@@ -1,0 +1,65 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="ProjectDBModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+  <EntityType Name="Services">
+    <Key>
+      <PropertyRef Name="ServiceID" />
+    </Key>
+    <Property Name="ServiceID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="ServiceName" Type="nchar" MaxLength="150" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Users">
+    <Key>
+      <PropertyRef Name="UserID" />
+    </Key>
+    <Property Name="UserID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Name" Type="nchar" MaxLength="150" Nullable="false" />
+    <Property Name="Mobile" Type="nchar" MaxLength="150" Nullable="false" />
+    <Property Name="Email" Type="nchar" MaxLength="150" Nullable="false" />
+  </EntityType>
+  <EntityType Name="UsersServices">
+    <Key>
+      <PropertyRef Name="UsersServicesID" />
+    </Key>
+    <Property Name="UsersServicesID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="UserID" Type="int" Nullable="false" />
+    <Property Name="ServiceID" Type="int" Nullable="false" />
+    <Property Name="InterestedValue" Type="decimal" Precision="18" Scale="0" Nullable="false" />
+  </EntityType>
+  <Association Name="FK_UsersServices_Services">
+    <End Role="Services" Type="Self.Services" Multiplicity="1" />
+    <End Role="UsersServices" Type="Self.UsersServices" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Services">
+        <PropertyRef Name="ServiceID" />
+      </Principal>
+      <Dependent Role="UsersServices">
+        <PropertyRef Name="ServiceID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_UsersServices_Users">
+    <End Role="Users" Type="Self.Users" Multiplicity="1" />
+    <End Role="UsersServices" Type="Self.UsersServices" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Users">
+        <PropertyRef Name="UserID" />
+      </Principal>
+      <Dependent Role="UsersServices">
+        <PropertyRef Name="UserID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <EntityContainer Name="ProjectDBModelStoreContainer">
+    <EntitySet Name="Services" EntityType="Self.Services" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Users" EntityType="Self.Users" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="UsersServices" EntityType="Self.UsersServices" Schema="dbo" store:Type="Tables" />
+    <AssociationSet Name="FK_UsersServices_Services" Association="Self.FK_UsersServices_Services">
+      <End Role="Services" EntitySet="Services" />
+      <End Role="UsersServices" EntitySet="UsersServices" />
+    </AssociationSet>
+    <AssociationSet Name="FK_UsersServices_Users" Association="Self.FK_UsersServices_Users">
+      <End Role="Users" EntitySet="Users" />
+      <End Role="UsersServices" EntitySet="UsersServices" />
+    </AssociationSet>
+  </EntityContainer>
+</Schema>
